@@ -22,7 +22,7 @@ class nlcOne4eachPair():
     self.sigmaY = [ 0.010643, 0.00862 ]
       
   def __call__(self, x):
-    '''
+    """
     Evaluates constraints. 
     Inputs: 
       x -- Habit parametrization, EH, sigmaH
@@ -30,7 +30,7 @@ class nlcOne4eachPair():
       c -- Vector of constraints values, where c_i >= 0 indicates that constraint is satisified.
            Constraints 1-4 are bound constraints for EH and sigmaH
            Constraints 5 and 6 are economic constraints, one for Japan, one for US. 
-    '''
+    """
     c = np.array([])
     # bound constraints
     # EH box
@@ -50,23 +50,23 @@ class nlcOne4eachPair():
 
 def forwardPremium(vectors):
     """
-    For each element of the input vectors, `forwardPremiumOut`
+    For each element of the input vectors, 'forwardPremiumOut'
     execution needs to be launched and supervised.
-    Parameter file `parameters.in` needs to be customised for each
+    Parameter file 'parameters.in' needs to be customised for each
     member of the given population and passed as part of the
-    `forwardPremiumOut` execution either to the cloud or to the grid
+    'forwardPremiumOut' execution either to the cloud or to the grid
     infrastructure.
-    Once the execution of `forwardPremiumOut` has terminated, the
-    value of `FamaFrenchbeta` should be extracted from the output file
-    `simulation.out` located in the output folder.
+    Once the execution of 'forwardPremiumOut' has terminated, the
+    value of 'FamaFrenchbeta' should be extracted from the output file
+    'simulation.out' located in the output folder.
     If a simulation does not produce a valid output, a penalty value
     should be used instead (use PENALTY_VALUE).
     The forwardPremium function terminates when *all* members of the
     given population have been evaluated and a result vector
-    containing the scaled `FamaFrenchbeta` values should then be returned
+    containing the scaled 'FamaFrenchbeta' values should then be returned
 
     Arguments:
-    `vectors`: list of population members to be exaluated
+    'vectors': list of population members to be exaluated
     example of vectors [ EX, sigmaX ] of size 10:
     
     [ 0.82679479,  0.00203506]
@@ -80,19 +80,19 @@ def forwardPremium(vectors):
     [ 0.50521085,  0.00167101]
     [ 0.96557172,  0.00473888]
 
-    Starting from `parameters.in` template file
+    Starting from 'parameters.in' template file
     http://ocikbapps.uzh.ch/gc3wiki/teaching/lsci2012/project/parameters.in
     substitute EA/EB and sigmaA/sigmaB from each
     member of the given population.
 
     Output:
-    `results`: list of corresponding `FamaFrenchbeta` values scaled in respect
+    'results': list of corresponding 'FamaFrenchbeta' values scaled in respect
     of the empirical value ( -0.63 )
     Note: the FamaFrenchbeta value extracted from the simulation output file,
     needs to be compared with the empirical value and scaled in respect of the
     standard deviation:
-            abs(`FamaFrenchbeta` - (-0.63))/0.25
-    This is the value that should be returned as part of `results` for each element
+            abs('FamaFrenchbeta' - (-0.63))/0.25
+    This is the value that should be returned as part of 'results' for each element
     of the given population (i.e. vectors)
 
     """
@@ -198,7 +198,7 @@ def calibrate_forwardPremium():
     # Update population and evaluate convergence
     opt.update_population(opt.new_pop, newVals)               
 
-  # Once iteration has terminated, extract `bestval` which should represent
+  # Once iteration has terminated, extract 'bestval' which should represent
   # the element in *all* populations that lead to the closest match to the
   # empirical value
   EX_best, sigmaX_best = opt.bestval
