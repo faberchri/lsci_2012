@@ -43,7 +43,7 @@ sessionInputLocation=$sessionLocation"/input/"
 parametersFile=$sessionInputLocation"parameters.in"
 if [ -f $parametersFile ]
 then
-	echo "The old parameters.in file "$parametersFile" is deleted.
+	echo "The old parameters.in file "$parametersFile" is deleted."
 	sudo -s rm $parametersFile
 fi
 touch $parametersFile
