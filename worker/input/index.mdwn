@@ -1,0 +1,1 @@
+[[!map pages="teaching/lsci2012/project/input/* and ! teaching/lsci2012/project/input/*/*"]]
