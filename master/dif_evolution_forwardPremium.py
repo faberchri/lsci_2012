@@ -111,6 +111,7 @@ def forwardPremium(vectors):
     run_folder = '/home/lsci/result/'+str(run_counter)
 
     successful_qsub_re = re.compile(r'Your job (\d+) \(".*"\) has been submitted')
+    job_failure = re.compile(r'error: job id (\d+) not found')
     qstat_job_line_re = re.compile(r'^ *(\d+) +')
 
     # init all jobs
@@ -139,6 +140,13 @@ def forwardPremium(vectors):
           jobid = match.group(1)
           if jobid in jobids:
             running.add(jobid)
+            # check if job failed
+            qacct_output = subprocess.check_output(['qacct', '-j', jobid])
+            match_failure = job_failure.match(line)
+	        if match_failure
+	          #requeue job
+	          subprocess.check_output(['qmod', '-rj', jobid])
+	
       for jobid in set(jobids):
         if jobid not in running:
           jobids.remove(jobid)
