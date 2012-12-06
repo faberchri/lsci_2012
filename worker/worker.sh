@@ -8,7 +8,7 @@
 # 6. -w arg [OPTIONAL]: working directory
 # outputs are stored in <output-ROOT-directory>/<cycle-count>/<job-id>
 
-outRootDir="/home/results" # default
+outRootDir="/home/results" # default /<cycle-nr>/<job-id>
 workingDir="/root" # default
 inputDir="/home/worker" # default
 
@@ -180,6 +180,8 @@ if [ -f $workingDir"/output/simulation.out" ]
 then
 	grep "FamaFrenchBeta" $workingDir"/output/simulation.out" > $outputDir"/FF-beta.out"
 	sed 's/FamaFrenchBeta//' $outputDir"/FF-beta.out" > $outputDir"/FF-beta.out"
+else
+    echo "Simulation did not converge."
 fi
 
 # move bin output dir to outputDir
