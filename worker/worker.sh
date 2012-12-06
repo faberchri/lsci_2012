@@ -8,7 +8,7 @@
 # 6. -w arg [OPTIONAL]: working directory
 # outputs are stored in <output-ROOT-directory>/<cycle-count>/<job-id>
 
-outRootDir="/home/results" # default /<cycle-nr>/<job-id>
+outRootDir="/home/result" # default /<cycle-nr>/<job-id>
 workingDir="/root" # default
 inputDir="/home/worker" # default
 
