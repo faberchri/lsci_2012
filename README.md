@@ -4,10 +4,12 @@ lsci_2012
 Using amazon aws and starcluster for evolutionary algorithm.
 
 Requirements:
+-------------
 - starcluster (easy_install starcluster)
 - AWS Credentials
 
 Configuration:
+--------------
 - Set up a star cluster configuration file with your AWS credentials and the number of nodes etc
 - You can use the default starcluster aws image
 - Copy the starcluster/conf.dist to starcluster/conf and fill in your credentials and generate the rsa key<br/><br/>
@@ -16,6 +18,7 @@ Configuration:
 	2. SSH login has to be without password (default starcluster vm)
 	3. The /root folder is used to process files local, so don't share it on NFS
 
-Commands: <br/>
+Commands:
+---------
  ./start.sh path/to/config clustername<br/>
  ./terminate.sh path/to/config clustername<br/>
