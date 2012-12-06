@@ -3,10 +3,6 @@
 type -P "starcluster" &>/dev/null || { echo "Err: Command not found: starcluster"
     echo "Install starcluster with command: easy_install starcluster"; exit 1; }
 
-outRootDir="/home/lsci/result" # default /<cycle-nr>/<job-id>
-workingDir="/root" # default
-inputDir="/home/lsci/worker" # default
-
 USAGE="Usage: `basename $0` <path/to/starcluster/config> nameOfCluster"
 
 # Parse command line options.
