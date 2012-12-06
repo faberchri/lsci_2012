@@ -108,7 +108,7 @@ def forwardPremium(vectors):
     
 	# init run folder
     global run_counter
-    run_folder = '/home/results/'+str(run_counter)
+    run_folder = '/home/result/'+str(run_counter)
 
     successful_qsub_re = re.compile(r'Your job (\d+) \(".*"\) has been submitted')
     qstat_job_line_re = re.compile(r'^ *(\d+) +')
@@ -254,9 +254,14 @@ def calibrate_forwardPremium():
   # Once iteration has terminated, extract 'bestval' which should represent
   # the element in *all* populations that lead to the closest match to the
   # empirical value
-  EX_best, sigmaX_best = opt.bestval
+  EX_best, sigmaX_best = opt.best
 
-  print "Calibration converged after [%d] steps. EX_best: %d, sigmaX_best: %d" % (opt.cur_iter, EX_best, sigmaX_best)
+  print "Calibration converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best)
+  
+  # write result fiel
+  result_file = open('/root/result', 'w')
+  result_file.write("Calibration converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best))
+  result_file.close()
   
 if __name__ == '__main__':
   calibrate_forwardPremium()
