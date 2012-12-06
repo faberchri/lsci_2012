@@ -188,7 +188,7 @@ def calibrate_forwardPremium():
   dim = 2 # the population will be composed of 2 parameters to  optimze: [ EX, sigmaX ]
   lower_bounds = [0.5,0.001] # Respectivaly for [ EX, sigmaX ]
   upper_bounds = [1,0.01]  # Respectivaly for [ EX, sigmaX ]
-  y_conv_crit = 2 # convergence treshold; stop when the evaluated output function y_conv_crit
+  y_conv_crit = 0.98 # convergence treshold; stop when the evaluated output function y_conv_crit
 
   # define constraints
   ev_constr = nlcOne4eachPair(lower_bounds, upper_bounds)
@@ -197,10 +197,10 @@ def calibrate_forwardPremium():
     dim = dim,          # number of parameters of the objective function
     lower_bds = lower_bounds,
     upper_bds = upper_bounds,
-    pop_size = 5,     # number of population members
+    pop_size = 10,     # number of population members
     de_step_size = 0.85,# DE-stepsize ex [0, 2]
     prob_crossover = 1, # crossover probabililty constant ex [0, 1]
-    itermax = 2,      # maximum number of iterations (generations)
+    itermax = 20,      # maximum number of iterations (generations)
     x_conv_crit = None, # stop when variation among x's is < this
     y_conv_crit = y_conv_crit, # stop when ofunc < y_conv_crit
     de_strategy = 'DE_local_to_best',

@@ -59,5 +59,5 @@ starcluster -c $config put $cluster worker /home/lsci/worker
 echo "--------------------------------------------------------"
 echo "Starting distributed experiment now! Check back later :)"
 # to see the whole output:
-#starcluster -c $config sshmaster $cluster 'chmod +x /home/lsci/master/master.sh && chmod +x /home/worker/worker.sh && /home/lsci/master/master.sh'
-starcluster -c $config sshmaster $cluster 'chmod +x /home/lsci/master/master.sh && chmod +x /home/worker/worker.sh && sh -c "nohup /home/lsci/master/master.sh > /dev/null 2>&1 &"'
+#starcluster -c $config sshmaster $cluster 'chmod +x /home/lsci/master/master.sh && chmod +x /home/lsci/worker/worker.sh && /home/lsci/master/master.sh'
+starcluster -c $config sshmaster $cluster 'chmod +x /home/lsci/master/master.sh && chmod +x /home/lsci/worker/worker.sh && sh -c "nohup /home/lsci/master/master.sh > /dev/null 2>&1 &"'
