@@ -179,9 +179,6 @@ cd $workingDir
 # extract FF-Beta from output if simulation.out present
 if [ -f $workingDir"/output/simulation.out" ]
 then
-	grep "FamaFrenchBeta" $workingDir"/output/simulation.out" > $outputDir"/FF-beta.out"
-	sed 's/FamaFrenchBeta//' $outputDir"/FF-beta.out" > $outputDir"/FF-beta.out"
-else
     echo "Simulation did not converge."
 fi
 
