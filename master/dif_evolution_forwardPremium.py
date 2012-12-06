@@ -4,6 +4,9 @@ import os
 import logging
 import shutil
 import subprocess
+import re
+import time
+
 
 import numpy as np
 
@@ -104,7 +107,11 @@ def forwardPremium(vectors):
     print ("---------------")
     
 	# init run folder
+    global run_counter
     run_folder = '/home/results/'+str(run_counter)
+
+    successful_qsub_re = re.compile(r'Your job (\d+) \(".*"\) has been submitted')
+    qstat_job_line_re = re.compile(r'^ *(\d+) +')
 
     # init all jobs
     jobs = { }
@@ -121,8 +128,6 @@ def forwardPremium(vectors):
       counter = counter + 1
 
     # wait for all jobs to finish
-	successful_qsub_re = re.compile(r'Your job (\d+) \(".*"\) has been submitted')
-	qstat_job_line_re = re.compile(r'^ *(\d+) +')
     interval = 60
     jobids = jobs.values()
     while jobids:
@@ -144,9 +149,9 @@ def forwardPremium(vectors):
     # gather all parameters from output files
     result_counter = 0
     for ex, sigmax in vectors:
-	  logger.info("getting results from session " + str(result_counter))
+	  logging.info("getting results from session " + str(result_counter))
 	  FF_BETA = extractFFBeta(result_counter, run_folder)
-	  logger.info("results received: "+str(FF_BETA))
+	  logging.info("results received: "+str(FF_BETA))
 	  results.append(abs(FF_BETA - (-0.63))/0.25)
 	  result_counter = result_counter + 1
 
