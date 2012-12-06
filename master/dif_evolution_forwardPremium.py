@@ -171,7 +171,8 @@ def extractFFBeta(sessionId, rootDir):
     print "FF-Beta is extracted from: " + simuRes
     if (not os.path.isfile(simuRes)):
         # simulation did not converge result just some big value that will be discarded
-        return 3.0
+        global PENALTY_VALUE
+        return PENALTY_VALUE
     for line in open(simuRes).readlines():
         if line.startswith("FamaFrenchBeta:"):
             name, value = line.split()
