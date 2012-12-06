@@ -15,11 +15,13 @@ cluster="supercluster"
 # start cluster
 starcluster -c $config start $cluster
 
+# clear master and client folders
+starcluster -c $config sshmaster $cluster 'rm -rf /home/lsci && mkdir /home/lsci'
+
+
 ### upload files to cluster
 # master files
-starcluster -c $config put $cluster --node master master/master.sh /root/master.sh
-starcluster -c $config put $cluster --node master master/dif_evolution_forwardPremium.py /root/dif_evolution_forwardPremium.py
-
+starcluster -c $config put $cluster --node master master /home/lsci/master
 # worker files
 starcluster -c $config put $cluster worker /home/worker
 
@@ -29,5 +31,5 @@ starcluster -c $config put $cluster worker /home/worker
 echo "--------------------------------------------------------"
 echo "Starting distributed experiment now! Check back later :)"
 # to see the whole output:
-#starcluster -c $config sshmaster $cluster 'chmod +x /root/master.sh && chmod +x /home/worker/worker.sh && /root/master.sh'
-starcluster -c $config sshmaster $cluster 'chmod +x /root/master.sh && chmod +x /home/worker/worker.sh && sh -c "nohup /root/master.sh > /dev/null 2>&1 &"'
+#starcluster -c $config sshmaster $cluster 'chmod +x /home/lsci/master/master.sh && chmod +x /home/worker/worker.sh && /home/lsci/master/master.sh'
+starcluster -c $config sshmaster $cluster 'chmod +x /home/lsci/master/master.sh && chmod +x /home/worker/worker.sh && sh -c "nohup /home/lsci/master/master.sh > /dev/null 2>&1 &"'

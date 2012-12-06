@@ -16,7 +16,7 @@ result=./result
 # fetch result file from master
 starcluster -c $config get $cluster --node master /root/result $result
 
-if [ -f $result && grep -iq "converged" $result ];
+if [ -f $result ];
 then
 	cat $result
 	echo "the result file is saved in ./results"
@@ -32,4 +32,5 @@ fi
 
 
 # terminate cluster
-starcluster -c $config terminate $cluster
+#starcluster -c $config terminate $cluster
+echo "terminating"
