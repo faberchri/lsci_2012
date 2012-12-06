@@ -1,5 +1,8 @@
 #!/bin/bash
 
+type -P "starcluster" &>/dev/null || { echo "Err: Command not found: starcluster"
+    echo "Install starcluster with command: easy_install starcluster"; exit 1; }
+
 if [ $# -eq 0 ]
   then
     echo "No arguments supplied. Please pass the path to your starcluster config as first parameter"
