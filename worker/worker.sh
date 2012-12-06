@@ -89,7 +89,7 @@ if [ -d $outputDir ]
 then
 	echo "output directory does already exist. "
 	echo "output directory is deleted: "$outputDir
-	sudo -s rm -R $outputDir
+	sudo rm -R $outputDir
 fi
 echo "create output directory: "$outputDir
 mkdir -p $outputDir
@@ -106,13 +106,14 @@ fi
 if [ -d $workingDir"/output" ]
 then
 	echo "old bin output directory is deleted: "$workingDir"/output"
-	sudo -s rm -R $workingDir"/output"
+	sudo rm -R $workingDir"/output"
 fi
 # copy binary if not available
 if [ ! -f $workingDir"/forwardPremiumOut" ]
 then
 	echo "copy binary from "$inputDir" to "$workingDir
 	cp $inputDir"/forwardPremiumOut" $workingDir"/."
+    sudo chmod +x $workingDir"/forwardPremiumOut"
 fi
 # copy constant input files if not available
 if [ ! -d $workingDir"/input" ]
@@ -126,7 +127,7 @@ parametersFile=$workingDir"/input/parameters.in"
 if [ -f $parametersFile ]
 then
 	echo "Deleting old parameters.in file: "$parametersFile
-	sudo -s rm $parametersFile
+	sudo rm $parametersFile
 fi
 
 # create new parameters.in file
