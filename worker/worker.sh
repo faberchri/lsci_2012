@@ -8,9 +8,9 @@
 # 6. -w arg [OPTIONAL]: working directory
 # outputs are stored in <output-ROOT-directory>/<cycle-count>/<job-id>
 
-outRootDir="/home/result" # default /<cycle-nr>/<job-id>
+outRootDir="/home/lsci/result" # default /<cycle-nr>/<job-id>
 workingDir="/root" # default
-inputDir="/home/worker" # default
+inputDir="/home/lsci/worker" # default
 
 USAGE="Usage: `basename $0` [-hv] [-i <Input/Dir>] [-o <Output/Dir>] [-w <Working/Dir>] EX sigmaX cycleCount jobId"
 

@@ -108,7 +108,7 @@ def forwardPremium(vectors):
     
 	# init run folder
     global run_counter
-    run_folder = '/home/result/'+str(run_counter)
+    run_folder = '/home/lsci/result/'+str(run_counter)
 
     successful_qsub_re = re.compile(r'Your job (\d+) \(".*"\) has been submitted')
     qstat_job_line_re = re.compile(r'^ *(\d+) +')
@@ -116,9 +116,8 @@ def forwardPremium(vectors):
     # init all jobs
     jobs = { }
     counter = 0
-    run_folder = '/home/results/'+str(run_counter)
     for ex, sigmax in vectors:
-      qsub_output = subprocess.check_output(['qsub', '-b', 'y', '/home/worker/worker.sh', str(ex), str(sigmax), str(run_counter), str(counter)])
+      qsub_output = subprocess.check_output(['qsub', '-b', 'y', '/home/lsci/worker/worker.sh', str(ex), str(sigmax), str(run_counter), str(counter)])
       match = successful_qsub_re.match(qsub_output)
       if match:
         jobid = match.group(1) # first parenthesized expression
@@ -198,10 +197,10 @@ def calibrate_forwardPremium():
     dim = dim,          # number of parameters of the objective function
     lower_bds = lower_bounds,
     upper_bds = upper_bounds,
-    pop_size = 10,     # number of population members
+    pop_size = 5,     # number of population members
     de_step_size = 0.85,# DE-stepsize ex [0, 2]
     prob_crossover = 1, # crossover probabililty constant ex [0, 1]
-    itermax = 200,      # maximum number of iterations (generations)
+    itermax = 2,      # maximum number of iterations (generations)
     x_conv_crit = None, # stop when variation among x's is < this
     y_conv_crit = y_conv_crit, # stop when ofunc < y_conv_crit
     de_strategy = 'DE_local_to_best',
