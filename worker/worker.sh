@@ -176,7 +176,7 @@ cd $workingDir
 # ... forwardPremiumOut running ...
 # .................................
 
-# extract FF-Beta from output if simulation.out present
+# check if simulation.out is present
 if [ -f $workingDir"/output/simulation.out" ]
 then
     echo "Simulation did not converge."

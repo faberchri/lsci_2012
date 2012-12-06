@@ -117,7 +117,7 @@ def forwardPremium(vectors):
     jobs = { }
     counter = 0
     for ex, sigmax in vectors:
-      qsub_output = subprocess.check_output(['qsub',,'-r','yes', '-b', 'y', '/home/lsci/worker/worker.sh', str(ex), str(sigmax), str(run_counter), str(counter)])
+      qsub_output = subprocess.check_output(['qsub','-r','yes', '-b', 'y', '/home/lsci/worker/worker.sh', str(ex), str(sigmax), str(run_counter), str(counter)])
       match = successful_qsub_re.match(qsub_output)
       if match:
         jobid = match.group(1) # first parenthesized expression
