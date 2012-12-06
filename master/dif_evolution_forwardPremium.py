@@ -259,7 +259,7 @@ def calibrate_forwardPremium():
   print "Calibration converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best)
   
   # write result fiel
-  result_file = open('/root/result', 'w')
+  result_file = open('/home/lsci/result_output', 'w')
   result_file.write("Calibration converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best))
   result_file.close()
   
