@@ -50,15 +50,18 @@ then
 fi
 
 # fetch result file from master
-starcluster -c $config get $cluster --node master /home/lsci/result_output $result
+starcluster -c $config get $cluster --node master /home/lsci/result_output $result > /dev/null
 
 if [ -f $result ];
 then
+	echo "\n\n\n\n\n"
+	echo "===================================================\n"
 	cat $result
-	echo "the result file is saved in ./results"
+	echo "\n\nthe result file is saved in ./results\n\n"
+	echo "===================================================\n"
 else
 	while true; do
-    	read -p "The program did not converge yet, do you want to terminate anyhow?" yn
+    	read -p "The program did not converge yet, do you want to terminate anyhow? (y/n)" yn
     	case $yn in
         	[Yy]* ) break;;
         	[Nn]* ) exit;;
