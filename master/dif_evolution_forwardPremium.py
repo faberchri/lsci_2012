@@ -10,6 +10,7 @@ import numpy as np
 from gc3libs.optimizer.dif_evolution import DifferentialEvolutionParallel
 
 PENALTY_VALUE=100
+run_counter=1
 
 class nlcOne4eachPair():
   def __init__(self, lower_bds, upper_bds):
@@ -101,16 +102,58 @@ def forwardPremium(vectors):
     print ("vecors")
     print vectors
     print ("---------------")
+    
+	# init run folder
+    run_folder = '/home/results/'+str(run_counter)
+
+    # init all jobs
+    jobs = { }
     counter = 0
+    run_folder = '/home/results/'+str(run_counter)
     for ex, sigmax in vectors:
-      print "forwardPremiumOut running with EX=%g, sigmaX=%g ..." % (ex, sigmax)
-      #create the new input file and start forwardWhatEver
-      subprocess.call(["/opt/ifi/worker.sh "+'%g' % ex+" "+'%g' % sigmax +" "+str(counter) +" /home/ubuntu/someTest2"],shell=True)
-        
-      # the actual vale should be extracted from the forwardPremium output file 'simulation.out'
-      FF_BETA = extractFFBeta(counter, "/home/ubuntu/someTest2")
-      results.append(abs(FF_BETA - (-0.63))/0.25)
+      qsub_output = subprocess.check_output(['qsub', '-b', 'y', '/home/worker/worker.sh', str(ex), str(sigmax), str(counter), run_folder])
+      match = successful_qsub_re.match(qsub_output)
+      if match:
+        jobid = match.group(1) # first parenthesized expression
+        jobs[counter] = jobid
+        logging.info("Job ex='%s', sigmax='%s' submitted as job %s", str(ex), str(sigmax), jobid)      
+      
       counter = counter + 1
+
+    # wait for all jobs to finish
+	successful_qsub_re = re.compile(r'Your job (\d+) \(".*"\) has been submitted')
+	qstat_job_line_re = re.compile(r'^ *(\d+) +')
+    interval = 60
+    jobids = jobs.values()
+    while jobids:
+      qstat_output = subprocess.check_output(['qstat'])
+      running = set()
+      for line in qstat_output.split('\n'):
+        match = qstat_job_line_re.match(line)
+        if match:
+          jobid = match.group(1)
+          if jobid in jobids:
+            running.add(jobid)
+      for jobid in set(jobids):
+        if jobid not in running:
+          jobids.remove(jobid)
+          logging.info("Job %s finished.", jobid)
+      logging.info("waiting for jobs to finish")
+      time.sleep(interval)    
+
+    # gather all parameters from output files
+    result_counter = 0
+    for ex, sigmax in vectors:
+	  logger.info("getting results from session " + str(result_counter))
+	  FF_BETA = extractFFBeta(result_counter, run_folder)
+	  logger.info("results received: "+str(FF_BETA))
+	  results.append(abs(FF_BETA - (-0.63))/0.25)
+	  result_counter = result_counter + 1
+
+
+    # increase run counter
+    run_counter = run_counter + 1
+
     return results
 
 def extractFFBeta(sessionId, rootDir):

@@ -12,5 +12,5 @@ sh ./install.sh --develop --yes
 
 
 # call evolution script
-python /root/dif_evolution_forwardPremium.py > sample.txt
+python /root/dif_evolution_forwardPremium.py # enable log: > /root/evolution.log
 

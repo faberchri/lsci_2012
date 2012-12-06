@@ -25,4 +25,6 @@ starcluster -c $config put $cluster worker /home/worker
 # execute master script
 echo "--------------------------------------------------------"
 echo "Starting distributed experiment now! Check back later :)"
+# to see the whole output:
+# starcluster -c $config sshmaster $cluster 'chmod +x /root/master.sh && /root/master.sh'
 starcluster -c $config sshmaster $cluster 'chmod +x /root/master.sh && sh -c "nohup /root/master.sh > /dev/null 2>&1 &"'
