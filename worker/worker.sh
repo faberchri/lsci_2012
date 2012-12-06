@@ -1,53 +1,136 @@
 #!/bin/bash
-# first argument is EX,
-# second argument is sigmaX,
-# third argument is session id,
-# fourth argument is root directory
-# outputs are stored in <root directory>/<session-id>/output
+# 1. arg: EX
+# 2. arg: sigmaX
+# 3. arg: cycle count
+# 4. arg: job id
+# 5. -i arg [OPTIONAL]: input ROOT directory
+# 5. -o arg [OPTIONAL]: output ROOT directory
+# 6. -w arg [OPTIONAL]: working directory
+# outputs are stored in <output-ROOT-directory>/<cycle-count>/<job-id>
 
-echo "EX: "$1
-echo "sigmaX: "$2
-echo "session id: "$3
-echo "root directory: "$4
+outRootDir="/home/results" # default
+workingDir="/root" # default
+inputDir="/home/worker" # default
 
-rootDir=$4
-if [ ! -d $rootDir ]
+USAGE="Usage: `basename $0` [-hv] [-i <Input/Dir>] [-o <Output/Dir>] [-w <Working/Dir>] EX sigmaX cycleCount jobId"
+
+# Parse command line options.
+while getopts hvo:w:i: OPT; do
+    case "$OPT" in
+        h)
+            echo $USAGE
+            exit 0
+            ;;
+        v)
+            echo "`basename $0` version 0.1"
+            exit 0
+            ;;
+        o)
+            outRootDir=$OPTARG
+            ;;
+        w)
+            workingDir=$OPTARG
+            ;;
+        i)
+            inputDir=$OPTARG
+            ;;
+        \?)
+            # getopts issues an error message
+            echo $USAGE >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Remove the switches we parsed above.
+shift `expr $OPTIND - 1`
+
+# We want at least one non-option argument. 
+# Remove this block if you don't need it.
+if [ $# -lt 4 ]
 then
-	echo "root directory does not exist. "
-	echo "root directory is created: "$rootDir
-	mkdir $rootDir
+    echo $USAGE >&2
+    exit 1
 fi
 
-sessionLocation=$rootDir"/"$3
+# Access additional arguments as usual through 
+# variables $@, $*, $1, $2, etc. or using this loop:
+eX=$1
+sigmaX=$2
+cycleCount=$3
+jobId=$4
 
-if [ -d $sessionLocation ]
+echo "EX: "$eX
+echo "sigmaX: "$sigmaX
+echo "cycle count: "$cycleCount
+echo "job id: "$jobId
+echo "root input dir: "$inputDir
+echo "root output directory: "$outRootDir
+echo "working directory: "$workingDir
+
+if [ ! -d $inputDir ]
 then
-	echo "old session directory is deleted: "$sessionLocation
-	sudo -s rm -R $sessionLocation
+	echo "Err: Input directory does not exist. "
+	echo $USAGE >&2
+	exit 1
 fi
 
-echo "new session directory is created: "$sessionLocation
-mkdir $sessionLocation
+if [ ! -d $outRootDir ]
+then
+	echo "output root directory does not exist. "
+	echo "output root directory is created: "$outRootDir
+	mkdir $outRootDir
+fi
 
-# copy the unchanged inputs to create session input
-echo "copy constant input files from /opt/ifi/input to "$sessionLocation
-cp -R /opt/ifi/input $sessionLocation"/."
+# create outputDir string
+outputDir=$outRootDir"/"$cycleCount"/"$jobId
 
-# copy binary
-echo "copy binary from /apps/ifi/forwardPremiumOut to "$sessionLocation
-cp /apps/ifi/forwardPremiumOut $sessionLocation"/forwardPremiumOut"
+if [ -d $outputDir ]
+then
+	echo "output directory does already exist. "
+	echo "output directory is deleted: "$outputDir
+	sudo -s rm -R $outputDir
+fi
+echo "create output directory: "$outputDir
+mkdir -p $outputDir
 
+if [ ! -d $workingDir ]
+then
+	echo "working directory does not exist. "
+	echo "working directory is created: "$workingDir
+	mkdir $workingDir
+fi
 
-sessionInputLocation=$sessionLocation"/input/"
+######## set up working dir ##########
+# delete old bin output directory
+if [ -d $workingDir"/output" ]
+then
+	echo "old bin output directory is deleted: "$workingDir"/output"
+	sudo -s rm -R $workingDir"/output"
+fi
+# copy binary if not available
+if [ ! -f $workingDir"/forwardPremiumOut" ]
+then
+	echo "copy binary from "$inputDir" to "$workingDir
+	cp $inputDir"/forwardPremiumOut" $workingDir"/."
+fi
+# copy constant input files if not available
+if [ ! -d $workingDir"/input" ]
+then
+	echo "copy constant input files from "$inputDir" to "$workingDir
+	cp -R $inputDir"/input" $workingDir"/."
+fi
 
-parametersFile=$sessionInputLocation"parameters.in"
+# remove a possibly present parameters.in file from working directory
+parametersFile=$workingDir"/input/parameters.in"
 if [ -f $parametersFile ]
 then
-	echo "The old parameters.in file "$parametersFile" is deleted."
+	echo "Deleting old parameters.in file: "$parametersFile
 	sudo -s rm $parametersFile
 fi
-touch $parametersFile
 
+# create new parameters.in file
+touch $parametersFile
 
 echo "group   |       name                                            |       value" >> $parametersFile
 echo "algo    |       T                                               |       100" >> $parametersFile
@@ -66,10 +149,10 @@ echo "econ    |       b1Bbar                                          |       -1
 echo "econ    |       b2Bbar                                          |       -1" >> $parametersFile
 echo "econ    |       wBar                                            |       -0.100" >> $parametersFile
 echo "econ    |       wGridBar                                        |       -0.100" >> $parametersFile
-echo "hbit    |       EA                                              |       $1" >> $parametersFile
-echo "hbit    |       EB                                              |       $1" >> $parametersFile
-echo "hbit    |       sigmaA                                          |       $2" >> $parametersFile
-echo "hbit    |       sigmaB                                          |       $2" >> $parametersFile
+echo "hbit    |       EA                                              |       $eX" >> $parametersFile
+echo "hbit    |       EB                                              |       $eX" >> $parametersFile
+echo "hbit    |       sigmaA                                          |       $sigmaX" >> $parametersFile
+echo "hbit    |       sigmaB                                          |       $sigmaX" >> $parametersFile
 echo "hbit    |       gridScaleA                                      |       1" >> $parametersFile
 echo "hbit    |       gridScaleB                                      |       1" >> $parametersFile
 echo "hbit    |       gridSizeA                                       |       3" >> $parametersFile
@@ -84,36 +167,20 @@ echo "----------- The parameters.in file --------------"
 cat $parametersFile
 echo "-------------------------------------------------"
 
-echo "****** starting forwardPremiumOut (session: "$3", location: "$sessionLocation"/forwardPremiumOut)... *******"
-cd $sessionLocation
+echo "****** starting forwardPremiumOut... (job id: "$jobId", cycle: "$cycleCount", location: "$workingDir") *******"
+cd $workingDir
 ./forwardPremiumOut
 
+# ................................. 
+# ... forwardPremiumOut running ...
+# .................................
 
+# extract FF-Beta from output if simulation.out present
+if [ -f $workingDir"/output/simulation.out" ]
+then
+	grep "FamaFrenchBeta" $workingDir"/output/simulation.out" > $outputDir"/FF-beta.out"
+	sed 's/FamaFrenchBeta//' $outputDir"/FF-beta.out" > $outputDir"/FF-beta.out"
+fi
 
-
-
-
-
-#replacementStringEX='s/EX/'$1'/'
-#sed $replacementStringEX /opt/ifi/parameter_template.in > /opt/ifi/input/tmp.in
-#
-#replacementStringSigmaX='s/sigmaX/'$2'/'
-#sed $replacementStringSigmaX /opt/ifi/input/tmp.in > /opt/ifi/input/parameters.in
-#
-#rm /opt/ifi/input/tmp.in
-#
-#if [ ! -f /opt/ifi/forwardPremiumOut ]
-#then
-#	cp /apps/ifi/forwardPremiumOut /opt/ifi/forwardPremiumOut
-#fi
-#
-#cat /opt/ifi/input/parameters.in
-#
-#/opt/ifi/forwardPremiumOut
-#
-
-
-#cd /opt/ifi/input
-#
-#echo "now run the fucking shit"
-#/apps/ifi/forwardPremiumOut
+# move bin output dir to outputDir
+mv $workingDir"/output" $outputDir

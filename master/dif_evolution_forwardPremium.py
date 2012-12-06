@@ -105,10 +105,10 @@ def forwardPremium(vectors):
     for ex, sigmax in vectors:
       print "forwardPremiumOut running with EX=%g, sigmaX=%g ..." % (ex, sigmax)
       #create the new input file and start forwardWhatEver
-      subprocess.call(["/opt/ifi/worker.sh "+'%g' % ex+" "+'%g' % sigmax +" "+str(counter) +" /home/ubuntu/someTest2"],shell=True)
+      subprocess.call(["/home/worker.sh "+'%g' % ex+" "+'%g' % sigmax +" "+str(counter) +" /home/testRun2"],shell=True)
         
       # the actual vale should be extracted from the forwardPremium output file 'simulation.out'
-      FF_BETA = extractFFBeta(counter, "/home/ubuntu/someTest2")
+      FF_BETA = extractFFBeta(counter, "/home/testRun2")
       results.append(abs(FF_BETA - (-0.63))/0.25)
       counter = counter + 1
     return results
