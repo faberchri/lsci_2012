@@ -141,11 +141,7 @@ def forwardPremium(vectors):
           if jobid in jobids:
             running.add(jobid)
             # check if job failed
-            qacct_output = subprocess.check_output(['qacct', '-j', jobid])
-            match_failure = job_failure.match(line)
-	        if match_failure
-	          #requeue job
-	          subprocess.check_output(['qmod', '-rj', jobid])
+            # TODO
 	
       for jobid in set(jobids):
         if jobid not in running:
