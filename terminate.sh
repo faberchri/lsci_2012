@@ -40,8 +40,8 @@ fi
 config=$1
 cluster=$2
 
-result=./"result_old_`date +%Y%m%d%H%M`"
-optLog=./"optimizer_`date +%Y%m%d%H%M`.log"
+result=./$cluster"_result_`date +%Y%m%d%H%M`"
+optLog=./$cluster"_optimizer_`date +%Y%m%d%H%M`.log"
 
 
 # fetch result file from master
@@ -53,12 +53,11 @@ echo "==================================================="
 echo ""
 echo "The optimizer log file is saved in: "$optLog
 echo ""
+echo "==================================================="
+echo ""
 
 if [ -f $result ];
 then
-	echo ""
-	echo "==================================================="
-    echo ""
 	cat $result
     echo " "
 	echo "The result file is saved in: "$result

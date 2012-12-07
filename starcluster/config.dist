@@ -39,7 +39,7 @@ CLUSTER_SIZE = 5
 # Do not change..
 CLUSTER_USER = sgeadmin
 CLUSTER_SHELL = bash
-NODE_IMAGE_ID = ami-899d49e0
+NODE_IMAGE_ID = ami-999d49f0
 NODE_INSTANCE_TYPE = c1.xlarge
 AVAILABILITY_ZONE = us-east-1a
 

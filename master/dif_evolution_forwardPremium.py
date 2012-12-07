@@ -105,9 +105,7 @@ def forwardPremium(vectors):
     # replace this with a real implementation
     global LOGGER
     results = []
-    print ("vecors")
-    print vectors
-    print ("---------------")
+    LOGGER.info("Starting forwardPremium with population: " + ', '.join(map(str, vectors)) )
     
 	# init run folder
     global run_counter
@@ -126,8 +124,7 @@ def forwardPremium(vectors):
       if match:
         jobid = match.group(1) # first parenthesized expression
         jobs[counter] = jobid
-        LOGGER.info("Job ex='%s', sigmax='%s' submitted as job %s", str(ex), str(sigmax), jobid)      
-        print "Job ex='%s', sigmax='%s' submitted as job %s" % (str(ex), str(sigmax), jobid)
+        LOGGER.info("Job ex='%s', sigmax='%s' submitted as job %s", str(ex), str(sigmax), jobid)
       
       counter = counter + 1
 
@@ -150,31 +147,26 @@ def forwardPremium(vectors):
         if jobid not in running:
           jobids.remove(jobid)
           LOGGER.info("Job %s finished.", jobid)
-          print "Job %s finished." % jobid
       LOGGER.info("waiting for jobs to finish")
-      print "waiting for jobs to finish"
+      LOGGER.info("qstat output:\n" + subprocess.check_output(['qstat']))
       time.sleep(interval)    
 
     # gather all parameters from output files
     result_counter = 0
     for ex, sigmax in vectors:
 	  LOGGER.info("getting results from session " + str(result_counter))
-	  print "getting results from session " + str(result_counter)
 	  FF_BETA = extractFFBeta(result_counter, run_folder)
 	  LOGGER.info("results received: "+str(FF_BETA))
-	  print "results received: "+str(FF_BETA)
 	  results.append(abs(FF_BETA - (-0.63))/0.25)
 	  result_counter = result_counter + 1
 
-
+    LOGGER.info("Results of forwardPremium (FF-Betas) of iteration " +str(run_counter) + ": " + ', '.join(map(str, opt.newVals)))
     # increase run counter
     run_counter = run_counter + 1
-
     return results
 
 def extractFFBeta(sessionId, rootDir):
     simuRes = rootDir + "/" + str(sessionId) + "/output/simulation.out"
-    print "FF-Beta is extracted from: " + simuRes
     if (not os.path.isfile(simuRes)):
         # simulation did not converge result just some big value that will be discarded
         global PENALTY_VALUE
@@ -211,6 +203,7 @@ def calibrate_forwardPremium():
   Ken Price's differential evolution
   algorithm: [[http://www1.icsi.berkeley.edu/~storn/code.html]].
   """
+  global LOGGER
   dim = 2 # the population will be composed of 2 parameters to  optimze: [ EX, sigmaX ]
   lower_bounds = [0.5,0.001] # Respectivaly for [ EX, sigmaX ]
   upper_bounds = [1,0.01]  # Respectivaly for [ EX, sigmaX ]
@@ -236,16 +229,11 @@ def calibrate_forwardPremium():
   # Initialise population using the arguments passed to the
   # DifferentialEvolutionParallel iniitalization
   opt.new_pop = opt.draw_initial_sample()
-  print("opt.new_pop: ")
-  print(opt.new_pop)
-  print ("---------------")
-
+  LOGGER.info("Initial sample drawn: " + ', '.join(map(str, opt.new_pop)) )
+  
   # This is where the population gets evaluated
   # it is part of the initialization step
   newVals = forwardPremium(opt.new_pop)
-  print("newVals: ")
-  print(newVals)
-  print ("---------------")
     
   # Update iteration count
   opt.cur_iter += 1
@@ -254,7 +242,8 @@ def calibrate_forwardPremium():
   opt.update_population(opt.new_pop, newVals)
     
   while not opt.has_converged():
-      
+    LOGGER.info("*********************************************************************")
+    LOGGER.info("Optimization has not converged after performing " + str(opt.cur_iter) + " iterations")  
     # Generate new population and enforce constrains
     opt.new_pop = opt.enforce_constr_re_evolve(opt.modify(opt.pop))
 
@@ -273,11 +262,11 @@ def calibrate_forwardPremium():
   # empirical value
   EX_best, sigmaX_best = opt.best
 
-  print "Calibration converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best)
+  LOGGER.info("Optimization converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best))
   
   # write result fiel
   result_file = open('/home/lsci/result_output', 'w')
-  result_file.write("Calibration converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best))
+  result_file.write("Optimization converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best))
   result_file.close()
 
   
