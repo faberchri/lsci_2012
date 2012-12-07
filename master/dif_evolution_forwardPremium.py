@@ -13,6 +13,8 @@ import numpy as np
 from gc3libs.optimizer.dif_evolution import DifferentialEvolutionParallel
 
 PENALTY_VALUE=100
+LOG_FILE="/home/lsci/optimizer.log"
+LOGGER="toBeInitialized"
 run_counter=1
 
 class nlcOne4eachPair():
@@ -101,6 +103,7 @@ def forwardPremium(vectors):
 
     """
     # replace this with a real implementation
+    global LOGGER
     results = []
     print ("vecors")
     print vectors
@@ -123,7 +126,7 @@ def forwardPremium(vectors):
       if match:
         jobid = match.group(1) # first parenthesized expression
         jobs[counter] = jobid
-        logging.info("Job ex='%s', sigmax='%s' submitted as job %s", str(ex), str(sigmax), jobid)      
+        LOGGER.info("Job ex='%s', sigmax='%s' submitted as job %s", str(ex), str(sigmax), jobid)      
         print "Job ex='%s', sigmax='%s' submitted as job %s" % (str(ex), str(sigmax), jobid)
       
       counter = counter + 1
@@ -146,19 +149,19 @@ def forwardPremium(vectors):
       for jobid in set(jobids):
         if jobid not in running:
           jobids.remove(jobid)
-          logging.info("Job %s finished.", jobid)
+          LOGGER.info("Job %s finished.", jobid)
           print "Job %s finished." % jobid
-      logging.info("waiting for jobs to finish")
+      LOGGER.info("waiting for jobs to finish")
       print "waiting for jobs to finish"
       time.sleep(interval)    
 
     # gather all parameters from output files
     result_counter = 0
     for ex, sigmax in vectors:
-	  logging.info("getting results from session " + str(result_counter))
+	  LOGGER.info("getting results from session " + str(result_counter))
 	  print "getting results from session " + str(result_counter)
 	  FF_BETA = extractFFBeta(result_counter, run_folder)
-	  logging.info("results received: "+str(FF_BETA))
+	  LOGGER.info("results received: "+str(FF_BETA))
 	  print "results received: "+str(FF_BETA)
 	  results.append(abs(FF_BETA - (-0.63))/0.25)
 	  result_counter = result_counter + 1
@@ -180,6 +183,26 @@ def extractFFBeta(sessionId, rootDir):
         if line.startswith("FamaFrenchBeta:"):
             name, value = line.split()
             return float(value)
+            
+def initLogging():
+  # Set up logger
+  log = logging.getLogger('gc3.gc3libs.EvolutionaryAlgorithm')
+  log.setLevel(logging.DEBUG)
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # logging.basicConfig(filename=LOG_FILE,level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+  log.propagate = 0
+  stream_handler = logging.StreamHandler()
+  stream_handler.setFormatter(formatter)
+  stream_handler.setLevel(logging.DEBUG)
+  import gc3libs
+  global LOG_FILE
+  file_handler = logging.FileHandler(LOG_FILE, mode = 'w')
+  file_handler.setLevel(logging.DEBUG)
+  file_handler.setFormatter(formatter)
+  log.addHandler(stream_handler)
+  log.addHandler(file_handler)
+  global LOGGER
+  LOGGER = log
 
 def calibrate_forwardPremium():
   """
@@ -188,7 +211,6 @@ def calibrate_forwardPremium():
   Ken Price's differential evolution
   algorithm: [[http://www1.icsi.berkeley.edu/~storn/code.html]].
   """
-
   dim = 2 # the population will be composed of 2 parameters to  optimze: [ EX, sigmaX ]
   lower_bounds = [0.5,0.001] # Respectivaly for [ EX, sigmaX ]
   upper_bounds = [1,0.01]  # Respectivaly for [ EX, sigmaX ]
@@ -201,7 +223,7 @@ def calibrate_forwardPremium():
     dim = dim,          # number of parameters of the objective function
     lower_bds = lower_bounds,
     upper_bds = upper_bounds,
-    pop_size = 10,     # number of population members
+    pop_size = 90,     # number of population members
     de_step_size = 0.85,# DE-stepsize ex [0, 2]
     prob_crossover = 1, # crossover probabililty constant ex [0, 1]
     itermax = 20,      # maximum number of iterations (generations)
@@ -231,17 +253,8 @@ def calibrate_forwardPremium():
   # Update population and evaluate convergence
   opt.update_population(opt.new_pop, newVals)
     
-    
-    
-  
-  # !!!!!!!!!!!! Add 'not' !!!!!!!!!!!!!!!!!!! 
   while not opt.has_converged():
-  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       
-      
-      
-      
-
     # Generate new population and enforce constrains
     opt.new_pop = opt.enforce_constr_re_evolve(opt.modify(opt.pop))
 
@@ -266,6 +279,8 @@ def calibrate_forwardPremium():
   result_file = open('/home/lsci/result_output', 'w')
   result_file.write("Calibration converged after [%d] steps. EX_best: %f, sigmaX_best: %f" % (opt.cur_iter, EX_best, sigmaX_best))
   result_file.close()
+
   
 if __name__ == '__main__':
+  initLogging()
   calibrate_forwardPremium()

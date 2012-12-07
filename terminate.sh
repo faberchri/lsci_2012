@@ -40,25 +40,31 @@ fi
 config=$1
 cluster=$2
 
-result=./result
+result=./"result_old_`date +%Y%m%d%H%M`"
+optLog=./"optimizer_`date +%Y%m%d%H%M`.log"
 
-# delete old result file
-if [ -f $result ]
-then
-	cp $result ./"result_old_`date +%H%M%S`"
-    rm $result
-fi
 
 # fetch result file from master
 starcluster -c $config get $cluster --node master /home/lsci/result_output $result > /dev/null
+starcluster -c $config get $cluster --node master /home/lsci/optimizer.log $optLog > /dev/null
+
+echo ""
+echo "==================================================="
+echo ""
+echo "The optimizer log file is saved in: "$optLog
+echo ""
 
 if [ -f $result ];
 then
-	echo "\n\n\n\n\n"
-	echo "===================================================\n"
+	echo ""
+	echo "==================================================="
+    echo ""
 	cat $result
-	echo "\n\nthe result file is saved in ./results\n\n"
-	echo "===================================================\n"
+    echo " "
+	echo "The result file is saved in: "$result
+    echo ""
+	echo "==================================================="
+    echo ""
 else
 	while true; do
     	read -p "The program did not converge yet, do you want to terminate anyhow? (y/n)" yn
