@@ -44,9 +44,13 @@ result=./$cluster"_result_`date +%Y%m%d%H%M`"
 optLog=./$cluster"_optimizer_`date +%Y%m%d%H%M`.log"
 
 
-# fetch result file from master
-starcluster -c $config get $cluster --node master /home/lsci/result_output $result > /dev/null
+# fetch optLog file from master
 starcluster -c $config get $cluster --node master /home/lsci/optimizer.log $optLog > /dev/null
+
+if [ ! -f $optLog ];
+then
+    exit;
+fi
 
 echo ""
 echo "==================================================="
@@ -55,6 +59,9 @@ echo "The optimizer log file is saved in: "$optLog
 echo ""
 echo "==================================================="
 echo ""
+
+# fetch result file from master
+starcluster -c $config get $cluster --node master /home/lsci/result_output $result > /dev/null
 
 if [ -f $result ];
 then
