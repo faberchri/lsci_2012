@@ -160,7 +160,7 @@ def forwardPremium(vectors):
 	  results.append(abs(FF_BETA - (-0.63))/0.25)
 	  result_counter = result_counter + 1
 
-    LOGGER.info("Results of forwardPremium (FF-Betas) of iteration " +str(run_counter) + ": " + ', '.join(map(str, opt.newVals)))
+    LOGGER.info("Results of forwardPremium (FF-Betas) of iteration " +str(run_counter) + ": " + ', '.join(map(str, results)))
     # increase run counter
     run_counter = run_counter + 1
     return results
@@ -243,7 +243,7 @@ def calibrate_forwardPremium():
     
   while not opt.has_converged():
     LOGGER.info("*********************************************************************")
-    LOGGER.info("Optimization has not converged after performing " + str(opt.cur_iter) + " iterations")  
+    LOGGER.info("Optimization has not converged after performing " + str(opt.cur_iter) + " iterations.")  
     # Generate new population and enforce constrains
     opt.new_pop = opt.enforce_constr_re_evolve(opt.modify(opt.pop))
 
