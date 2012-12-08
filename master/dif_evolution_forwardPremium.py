@@ -243,7 +243,7 @@ def calibrate_forwardPremium():
     
   while not opt.has_converged():
     LOGGER.info("*********************************************************************")
-    LOGGER.info("Optimization has not converged after performing " + str(opt.cur_iter) + " iterations.")  
+    LOGGER.info("Optimization has not converged after performing iteration [" + str(opt.cur_iter) + "].")  
     # Generate new population and enforce constrains
     opt.new_pop = opt.enforce_constr_re_evolve(opt.modify(opt.pop))
 
