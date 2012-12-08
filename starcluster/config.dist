@@ -34,7 +34,7 @@ KEY_LOCATION=~/.ssh/starcluster.rsa
 [cluster smallcluster]
 KEYNAME = starcluster
 # number of ec2 instances to launch
-CLUSTER_SIZE = 5
+CLUSTER_SIZE = 13
 
 # Do not change..
 CLUSTER_USER = sgeadmin

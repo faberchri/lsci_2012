@@ -216,7 +216,7 @@ def calibrate_forwardPremium():
     dim = dim,          # number of parameters of the objective function
     lower_bds = lower_bounds,
     upper_bds = upper_bounds,
-    pop_size = 90,     # number of population members
+    pop_size = 100,     # number of population members
     de_step_size = 0.85,# DE-stepsize ex [0, 2]
     prob_crossover = 1, # crossover probabililty constant ex [0, 1]
     itermax = 20,      # maximum number of iterations (generations)

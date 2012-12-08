@@ -9,10 +9,10 @@
 # outputs are stored in <output-ROOT-directory>/<cycle-count>/<job-id>
 
 outRootDir="/home/lsci/result" # default /<cycle-nr>/<job-id>
-workingDir="/root" # default
+workingDir="/root/workDirs" # default
 inputDir="/home/lsci/worker" # default
 
-USAGE="Usage: `basename $0` [-hv] [-i <Input/Dir>] [-o <Output/Dir>] [-w <Working/Dir>] EX sigmaX cycleCount jobId"
+USAGE="Usage: `basename $0` [-hv] [-i <Input/Dir>] [-o <Output/Dir>] EX sigmaX cycleCount jobId"
 
 # Parse command line options.
 while getopts hvo:w:i: OPT; do
@@ -27,9 +27,6 @@ while getopts hvo:w:i: OPT; do
             ;;
         o)
             outRootDir=$OPTARG
-            ;;
-        w)
-            workingDir=$OPTARG
             ;;
         i)
             inputDir=$OPTARG
@@ -66,7 +63,7 @@ echo "cycle count: "$cycleCount
 echo "job id: "$jobId
 echo "root input dir: "$inputDir
 echo "root output directory: "$outRootDir
-echo "working directory: "$workingDir
+
 
 if [ ! -d $inputDir ]
 then
@@ -89,20 +86,37 @@ if [ -d $outputDir ]
 then
 	echo "output directory does already exist. "
 	echo "output directory is deleted: "$outputDir
-	sudo rm -R $outputDir
+	sudo rm -rf $outputDir
 fi
 echo "create output directory: "$outputDir
 mkdir -p $outputDir
 
-if [ ! -d $workingDir ]
+##### Search available working dir#####
+foundWorkingDir=false
+for i in `ls $workingDir`
+do	
+	i=$workingDir"/"$i
+    if [ ! -f $i/busy ]
+    then
+        touch $i/busy #set busy flag for working dir
+        foundWorkingDir=true
+        workingDir=$i
+        break
+    fi
+done
+
+# we did not find a free working dir -> we create a new one
+######## create working dir ##########
+if [ $foundWorkingDir == "false" ]
 then
-	echo "working directory does not exist. "
-	echo "working directory is created: "$workingDir
-	mkdir $workingDir
+    workingDir=$workingDir"/working_dir_$$_`date +%s%N`_$RANDOM"
+    echo "working directory is created: "$workingDir
+    mkdir -p $workingDir
+    touch $workingDir"/busy" #set busy flag for working dir
 fi
 
 ######## set up working dir ##########
-# delete old bin output directory
+# delete old bin output directory -> shouldn't any be there
 if [ -d $workingDir"/output" ]
 then
 	echo "old bin output directory is deleted: "$workingDir"/output"
@@ -127,10 +141,10 @@ parametersFile=$workingDir"/input/parameters.in"
 if [ -f $parametersFile ]
 then
 	echo "Deleting old parameters.in file: "$parametersFile
-	sudo rm $parametersFile
+	sudo rm -f $parametersFile
 fi
 
-# create new parameters.in file
+###### create new parameters.in file ######
 touch $parametersFile
 
 echo "group   |       name                                            |       value" >> $parametersFile
@@ -184,3 +198,6 @@ fi
 
 # move bin output dir to outputDir
 mv $workingDir"/output" $outputDir
+
+# delete busy flag from current working dir
+rm -f $workingDir"/busy"
