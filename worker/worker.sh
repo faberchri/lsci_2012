@@ -1,15 +1,14 @@
 #!/bin/bash
-# 1. arg: EX
-# 2. arg: sigmaX
-# 3. arg: cycle count
-# 4. arg: job id
-# 5. -i arg [OPTIONAL]: input ROOT directory
-# 5. -o arg [OPTIONAL]: output ROOT directory
-# 6. -w arg [OPTIONAL]: working directory
+# 1. -i arg [OPTIONAL]: input ROOT directory
+# 2. -o arg [OPTIONAL]: output ROOT directory
+# 3. arg: EX
+# 4. arg: sigmaX
+# 5. arg: cycle count
+# 6. arg: job id
 # outputs are stored in <output-ROOT-directory>/<cycle-count>/<job-id>
 
 outRootDir="/home/lsci/result" # default /<cycle-nr>/<job-id>
-workingDir="/root/workDirs" # default
+workingDir="/root/workDirs" # fixed
 inputDir="/home/lsci/worker" # default
 
 USAGE="Usage: `basename $0` [-hv] [-i <Input/Dir>] [-o <Output/Dir>] EX sigmaX cycleCount jobId"
