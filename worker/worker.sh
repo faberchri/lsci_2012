@@ -193,6 +193,8 @@ cd $workingDir
 # check if simulation.out is present
 if [ -f $workingDir"/output/simulation.out" ]
 then
+    echo "Simulation converged."
+else
     echo "Simulation did not converge."
 fi
 
