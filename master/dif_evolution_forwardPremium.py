@@ -149,6 +149,7 @@ def forwardPremium(vectors):
           LOGGER.info("Job %s finished.", jobid)
       LOGGER.info("waiting for jobs to finish")
       LOGGER.info("qstat output:\n" + subprocess.check_output(['qstat']))
+      LOGGER.info("qhost output:\n" + subprocess.check_output(['qhost']))
       time.sleep(interval)    
 
     # gather all parameters from output files
