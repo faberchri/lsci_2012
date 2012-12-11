@@ -13,6 +13,7 @@ import numpy as np
 from gc3libs.optimizer.dif_evolution import DifferentialEvolutionParallel
 
 PENALTY_VALUE=100
+POPULATION_SIZE=100
 LOG_FILE="/home/lsci/optimizer.log"
 LOGGER="toBeInitialized"
 run_counter=1
@@ -131,6 +132,7 @@ def forwardPremium(vectors):
     # wait for all jobs to finish
     interval = 60
     jobids = jobs.values()
+    max_waiting_wime = 2280 # we dont't wait longer for a single cycle to complete than 38 minutes
     while jobids:
       qstat_output = subprocess.check_output(['qstat'])
       running = set()
@@ -150,8 +152,17 @@ def forwardPremium(vectors):
       LOGGER.info("waiting for jobs to finish")
       LOGGER.info("qstat output:\n" + subprocess.check_output(['qstat']))
       LOGGER.info("qhost output:\n" + subprocess.check_output(['qhost']))
+      if max_waiting_time <= 0:
+          #max waiting time is over, delete all submitted jobs
+          LOGGER.info("Max wait time is over. All submitted and not yet finished jobs are deleted.")
+          del_output=subprocess.check_output(['qdel','-u','"*"'])
+          LOGGER.info("qdel output:\n" + del_output)
+          LOGGER.info("qstat output after jobs deletion:\n" + subprocess.check_output(['qstat']))
+          break 
+          
       time.sleep(interval)    
-
+      max_waiting_time = max_waiting_time - interval
+      
     # gather all parameters from output files
     result_counter = 0
     for ex, sigmax in vectors:
@@ -160,7 +171,13 @@ def forwardPremium(vectors):
 	  LOGGER.info("results received: "+str(FF_BETA))
 	  results.append(abs(FF_BETA - (-0.63))/0.25)
 	  result_counter = result_counter + 1
-
+   
+    global POPULATION_SIZE
+    while len(results) < POPULATION_SIZE:
+        global PENALTY_VALUE
+        LOGGER.info("Additional penalty value is added because results vector is smaller than POPULATION_SIZE: len(results) = " +str(len(results)) + ";  POPULATION_SIZE: " + str(POPULATION_SIZE))
+        results.append(PENALTY_VALUE)
+    
     LOGGER.info("Results of forwardPremium (FF-Betas) of iteration " +str(run_counter) + ": " + ', '.join(map(str, results)))
     # increase run counter
     run_counter = run_counter + 1
@@ -212,12 +229,13 @@ def calibrate_forwardPremium():
 
   # define constraints
   ev_constr = nlcOne4eachPair(lower_bounds, upper_bounds)
-
+  
+  global POPULATION_SIZE
   opt = DifferentialEvolutionParallel(
     dim = dim,          # number of parameters of the objective function
     lower_bds = lower_bounds,
     upper_bds = upper_bounds,
-    pop_size = 100,     # number of population members
+    pop_size = POPULATION_SIZE,     # number of population members
     de_step_size = 0.85,# DE-stepsize ex [0, 2]
     prob_crossover = 1, # crossover probabililty constant ex [0, 1]
     itermax = 20,      # maximum number of iterations (generations)
