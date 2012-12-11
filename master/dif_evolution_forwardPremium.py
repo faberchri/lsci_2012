@@ -132,7 +132,7 @@ def forwardPremium(vectors):
     # wait for all jobs to finish
     interval = 60
     jobids = jobs.values()
-    max_waiting_wime = 2280 # we dont't wait longer for a single cycle to complete than 38 minutes
+    max_waiting_time = 2280 # we dont't wait longer for a single cycle to complete than 38 minutes
     while jobids:
       qstat_output = subprocess.check_output(['qstat'])
       running = set()
@@ -155,7 +155,7 @@ def forwardPremium(vectors):
       if max_waiting_time <= 0:
           #max waiting time is over, delete all submitted jobs
           LOGGER.info("Max wait time is over. All submitted and not yet finished jobs are deleted.")
-          del_output=subprocess.check_output(['qdel','-u','"*"'])
+          del_output=subprocess.check_output(['qdel','-u','*'])
           LOGGER.info("qdel output:\n" + del_output)
           LOGGER.info("qstat output after jobs deletion:\n" + subprocess.check_output(['qstat']))
           break 
